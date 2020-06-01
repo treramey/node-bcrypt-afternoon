@@ -10,6 +10,15 @@ const express = require("express"),
 
 app.use(express.json());
 
+app.use(
+    session({
+        resave: false,
+        saveUninitialized: true,
+        secret: SESSION_SECRET,
+        cookie: { maxAge: 1000 * 60 * 60 * 24 },
+    })
+);
+
 massive({
     connectionString: CONNECTION_STRING,
     ssl: { rejectUnauthorized: false },
@@ -19,13 +28,6 @@ massive({
     app.listen(SERVER_PORT, () => console.log(`Running on PORT ${SERVER_PORT}.`))
 })
 
-app.use(
-    session({
-        resave: false,
-        saveUninitialized: true,
-        secret: SESSION_SECRET,
-    })
-);
 
 
 app.post("/auth/register", register);
