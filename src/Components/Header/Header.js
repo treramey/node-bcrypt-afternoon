@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from "axios";
 import './Header.css';
 
 export default class Header extends Component {
@@ -29,14 +30,37 @@ export default class Header extends Component {
 
   login() {
     // axios POST to /auth/login here
+    const { username, password } = this.state;
+    axios.post('/auth/login', {
+      username,
+      password
+    }).then(response => {
+      this.props.updateUser(response.data);
+      this.setState({ username: '', password: '' })
+    }).catch(error => alert(error.response.request.response));
   }
 
   register() {
     // axios POST to /auth/register here
+    const { username, password, isAdmin } = this.state;
+    axios.post('/auth/register', {
+      username,
+      password,
+      isAdmin
+    }).then(response => {
+      this.setState({ username: '', password: '' });
+      this.props.updateUser(response.data)
+    }).catch(error => {
+      this.setState({ username: '', password: '' });
+      alert(error.response.request.response);
+    });
   }
 
   logout() {
     // axios GET to /auth/logout here
+    axios.get('/auth/logout').then(() => {
+      this.props.updateUser({});
+    }).catch(error => console.log(error));
   }
 
   render() {
@@ -53,28 +77,28 @@ export default class Header extends Component {
             </button>
           </div>
         ) : (
-          <div className="loginContainer">
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={e => this.handleUsernameInput(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={e => this.handlePasswordInput(e.target.value)}
-            />
-            <div className="adminCheck">
-              <input type="checkbox" id="adminCheckbox" onChange={() => this.toggleAdmin()} /> <span> Admin </span>
-            </div>
-            <button onClick={this.login}>Log In</button>
-            <button onClick={this.register} id="reg">
-              Register
+            <div className="loginContainer">
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={e => this.handleUsernameInput(e.target.value)}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={e => this.handlePasswordInput(e.target.value)}
+              />
+              <div className="adminCheck">
+                <input type="checkbox" id="adminCheckbox" onChange={() => this.toggleAdmin()} /> <span> Admin </span>
+              </div>
+              <button onClick={this.login}>Log In</button>
+              <button onClick={this.register} id="reg">
+                Register
             </button>
-          </div>
-        )}
+            </div>
+          )}
       </div>
     );
   }
